@@ -1,16 +1,24 @@
 """
-UNCOVR Paragraph Library — v0.1
+UNCOVR Paragraph Library — v0.2
 ================================
 Paragraphs keyed by section name.
 
 Sections that have {placeholders} are surgeon dropdowns.
 The OPTIONS comment above each paragraph lists exactly what
 can go in each placeholder — the surgeon picks from these.
+
+INPUT SOURCES:
+  - "setup config" = configured once before the app is used (e.g. robot type)
+  - "surgeon dropdown" = selected per case in the UI
+  - "model detected" = auto-detected from surgical video
+  - "surgeon toggle" = binary on/off button in UI (e.g. TIF happened)
+  - "surgeon complication" = selected from complications dropdown (multi-select)
 """
 
 PARAGRAPHS = {
 
-    # ── No dropdowns — fully static ───────────────────────────────────────
+    # ── SETUP CONFIG ─────────────────────────────────────────────────────
+    # {robot_type}: "dv5" or "Xi"  (setup config — set once before app use)
 
     "BOILERPLATE_SETUP": (
         "After informed consent was obtained, the patient was brought to the operating room "
@@ -18,7 +26,7 @@ PARAGRAPHS = {
         "and nature of surgery were confirmed with the patient. The patient was then administered "
         "general anesthesia in the usual fashion. The patients arms were tucked and legs placed "
         "in a supine position with a foot board. TED hose and SCDs were placed. This surgery was "
-        "performed with the dv5 robot.\n\n"
+        "performed with the {robot_type} robot.\n\n"
         "A time out procedure was performed.\n\n"
         "The abdomen was then sterile prepped and draped in the standard fashion. lidocaine 1% "
         "was infiltrated in the supraumbilical area and a 8 mm trocar was placed supraumbilically "
@@ -40,6 +48,14 @@ PARAGRAPHS = {
         "EGD: upper endoscopy revealed the presence of a {sliding_cm} cm sliding component "
         "with a paraesophageal component and a Hill Grade {hill_grade} valve. "
         "The pylorus was also intubated and the proximal duodenum evaluated. {egd_extra}"
+    ),
+
+    # ── No dropdowns — fully static — model detected ────────────────────
+
+    "LYSIS_OF_ADHESIONS": (
+        "LYSIS OF ADHESIONS:\n"
+        "Dense omental adhesions were taken down laparoscopically using blunt and "
+        "sharp dissection. This allowed for adequate visualization of the hiatal region."
     ),
 
     # ── OPTIONS ───────────────────────────────────────────────────────────
@@ -82,6 +98,36 @@ PARAGRAPHS = {
         "During dissection, an injury to the {vagus_branch} vagus nerve was identified. "
         "The nerve was noted to be {vagus_injury_extent}. "
         "This was documented and the remainder of the procedure was continued."
+    ),
+
+    # ── SURGEON COMPLICATION DROPDOWN ─────────────────────────────────────
+    # These are NOT model-detected. Surgeon selects from a multi-select
+    # complications dropdown in the UI. Zero or more can be selected.
+    #
+    # Available complications:
+    #   "STOMACH_INJURY"    — gastric serosal/full-thickness injury
+    #   "SPLENIC_INJURY"    — splenic laceration or decapsulization
+    #   "ESOPHAGEAL_INJURY" — esophageal perforation or thermal injury
+
+    "STOMACH_INJURY": (
+        "COMPLICATION — GASTRIC INJURY:\n"
+        "During dissection, an injury to the stomach wall was identified. "
+        "This was repaired primarily with vicryl suture and reinforced with "
+        "a layer of Lembert sutures. The repair was inspected and confirmed "
+        "to be intact."
+    ),
+
+    "SPLENIC_INJURY": (
+        "COMPLICATION — SPLENIC INJURY:\n"
+        "A small splenic laceration was noted to be present. Bleeding was "
+        "controlled with bipolar cautery and Surgicel. Hemostasis was confirmed."
+    ),
+
+    "ESOPHAGEAL_INJURY": (
+        "COMPLICATION — ESOPHAGEAL INJURY:\n"
+        "During dissection, an injury to the esophageal wall was identified. "
+        "The defect was repaired primarily with absorbable suture. "
+        "A leak test was performed and confirmed no extravasation."
     ),
 
     # ── OPTIONS ───────────────────────────────────────────────────────────
@@ -189,6 +235,17 @@ PARAGRAPHS = {
         "with no leak."
     ),
 
+    # ── OPTIONS — surgeon toggle ────────────────────────────────────────
+    # TIF is enabled via a separate button in the UI (not model-detected).
+    # {tif_doctor_name}: free text or dropdown of known GI doctors
+
+    "TIF": (
+        "TRANSLUMINAL INCISIONLESS FUNDOPLICATION:\n"
+        "Please refer to Dr {tif_doctor_name}'s note for the TIF.\n\n"
+        "The device and the scope were withdrawn. A completion EGD showed the "
+        "presence of an excellent subdiaphragmatic fundoplication."
+    ),
+
     # ── OPTIONS ───────────────────────────────────────────────────────────
     # {linx_sizer_mm}  : "11", "13", "14"
     # {linx_device_mm} : "14", "16", "17"
@@ -212,6 +269,12 @@ PARAGRAPHS = {
     "EGD_COMPLETION": (
         "The endoscope was removed after confirming the presence of a \"stacked coin\" appearance "
         "to the fundoplication. {egd_completion_finding}"
+    ),
+
+    # ── No dropdowns — model detected ───────────────────────────────────
+
+    "DRAIN_PLACEMENT": (
+        "A drain was placed posterior to the fundoplication."
     ),
 
     # ── No dropdowns — fully static ───────────────────────────────────────

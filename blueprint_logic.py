@@ -235,6 +235,16 @@ SURGEON picks {redo_scenario} from:
 if {redo_scenario} is "unplanned_return":
     include MODIFIER_78_UNPLANNED_RETURN paragraph
     # {return_reason}: free text (e.g. "postoperative bleeding", "mesh slippage", "wrap herniation")
+if {redo_scenario} is "staged_redo":
+    include MODIFIER_58_STAGED_REDO paragraph
+if {redo_scenario} is "repeat_same_surgeon":
+    include MODIFIER_76_REPEAT_SAME paragraph
+if {redo_scenario} is "repeat_diff_surgeon":
+    include MODIFIER_77_REPEAT_DIFF paragraph
+    # {original_surgeon_name}: free text
+if {redo_scenario} is "unrelated_procedure":
+    include MODIFIER_79_UNRELATED paragraph
+    # {unrelated_procedure_desc}: free text
 
 Always include CLOSURE paragraph                          # always
 

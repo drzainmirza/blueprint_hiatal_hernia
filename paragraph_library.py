@@ -269,6 +269,28 @@ PARAGRAPHS = {
         "a related problem: {return_reason}."
     ),
 
+    "MODIFIER_58_STAGED_REDO": (
+        "This procedure represents a planned staged procedure during the "
+        "postoperative period, as documented at the time of the original operation."
+    ),
+
+    "MODIFIER_76_REPEAT_SAME": (
+        "This is a repeat of the same procedure by the same physician "
+        "during the postoperative period."
+    ),
+
+    # {original_surgeon_name}: free text
+    "MODIFIER_77_REPEAT_DIFF": (
+        "This is a repeat of the same procedure, originally performed by "
+        "Dr. {original_surgeon_name}, now being performed by a different physician."
+    ),
+
+    # {unrelated_procedure_desc}: free text
+    "MODIFIER_79_UNRELATED": (
+        "This procedure ({unrelated_procedure_desc}) is unrelated to the original "
+        "procedure and is being performed during the postoperative period."
+    ),
+
     # {assistant_doctor_name}: free text
     "MODIFIER_82_ATTESTATION": (
         "Dr. {assistant_doctor_name} served as assistant surgeon. This procedure was "

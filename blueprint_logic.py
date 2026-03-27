@@ -83,9 +83,48 @@ include POSTOP_DIAGNOSIS paragraph        # defaults to "Same"
 # ── PROCEDURES PERFORMED (auto-populated from detected procedures) ────────
 include PROCEDURES_PERFORMED paragraph    # lists detected procedures as line items
 
+# ── FINDINGS (surgeon multi-select + free text) ─────────────────────────
+# Common intraoperative findings — surgeon selects zero or more, plus optional free text
+include FINDINGS paragraph
+    MODEL DETECTS / SURGEON multi-selects {findings} from:
+        "No evidence of intra-abdominal infection present at the time of surgery"
+        "Hepatic steatosis"
+        "Cameron ulcers noted in the proximal stomach"
+        "Dense adhesions noted"
+        "Prior fundoplication — partially disrupted"
+        "Prior fundoplication — completely disrupted"
+        "Prior mesh migration"
+        "Colonic herniation into hernia sac"
+    SURGEON optional free text {findings_extra}
+
+# ── PREPARATION (structured case metadata) ───────────────────────────────
+include PREPARATION paragraph
+    # {anesthesia_type}: "General endotracheal", "General"
+    # {specimen}: "None", free text
+    # {wound_class}: "I: Clean", "II: Clean/Contaminated"
+    # {case_acuity}: "elective case (routine; scheduled)", "urgent", "emergent"
+
+if MODEL detects critical bleeding:
+    let surgeon estimate!!
+if MODEL detects severe bleeding:
+    set EBL to 300ml
+elif MODEL detects moderate bleeding:
+    set EBL to 100ml
+elif MODEL detects minor bleeding:
+    set EBL to 50ml
+else:
+    set EBL to 20ml
+
 # ── OPERATIVE NOTE BODY ──────────────────────────────────────────────────
 
 Always include BOILERPLATE_SETUP paragraph               # uses {robot_type}
+
+
+if surgeon says that pars flaccida was cut (which is a signal for a re-do operation):
+    ASK the surgeon "Is this operation taking place within the global period?" (Yes/No)
+    if yes:
+        use modifier
+
 
 if MODEL detects "1.10_Intraoperative_Endoscopy":
     include EGD_INITIAL paragraph
@@ -184,7 +223,26 @@ if SETUP is_teaching_facility AND SURGEON toggles "no_resident_available" ON:
     include MODIFIER_82_ATTESTATION paragraph
     # {assistant_doctor_name}: free text
 
+# ── REDO / REPEAT SCENARIO (surgeon dropdown — picks ONE or none) ────────
+SURGEON picks {redo_scenario} from:
+    "none"                  → no modifier (default — first-time procedure)
+    "unplanned_return"      → modifier 78: unplanned return to OR for related problem (e.g. bleeding, mesh slippage, wrap herniation)
+    "staged_redo"           → modifier 58: planned/staged redo documented at original op
+    "repeat_same_surgeon"   → modifier 76: exact same procedure repeated by same surgeon
+    "repeat_diff_surgeon"   → modifier 77: exact same procedure repeated by different surgeon
+    "unrelated_procedure"   → modifier 79: unrelated procedure during postoperative period
+
+if {redo_scenario} is "unplanned_return":
+    include MODIFIER_78_UNPLANNED_RETURN paragraph
+    # {return_reason}: free text (e.g. "postoperative bleeding", "mesh slippage", "wrap herniation")
+
 Always include CLOSURE paragraph                          # always
+
+include DISPOSITION paragraph with the following dropdown options for surgeon to select!
+    # {disposition}: "PACU followed by surgical floor"
+    #                "PACU followed by ICU for close monitoring"
+    #                "PACU followed by same-day discharge"
+    #                free text
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -215,3 +273,10 @@ if modifier_22_qualifies (see MODIFIER 22 section above):
 # Assistant surgeon bills the SAME primary cpt code with "-82" appended
 if SETUP is_teaching_facility AND SURGEON toggled "no_resident_available" ON:
     assistant cpt code = primary cpt code + "-82"       # e.g. 43282-82
+
+# Redo/repeat modifiers — surgeon picks one or none, appends to primary cpt code
+if {redo_scenario} is "unplanned_return":       primary cpt code += "-78" (add this modifier code)
+if {redo_scenario} is "staged_redo":            primary cpt code += "-58"
+if {redo_scenario} is "repeat_same_surgeon":    primary cpt code += "-76"
+if {redo_scenario} is "repeat_diff_surgeon":    primary cpt code += "-77"
+if {redo_scenario} is "unrelated_procedure":    primary cpt code += "-79"

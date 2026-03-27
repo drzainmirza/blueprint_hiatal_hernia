@@ -23,6 +23,21 @@ PARAGRAPHS = {
         "{procedures_list}"
     ),
 
+    # {findings_list}: auto-built from surgeon multi-select + free text
+    "FINDINGS": (
+        "FINDINGS:\n"
+        "{findings_list}"
+    ),
+
+    # {anesthesia_type}, {ebl}, {specimen}, {wound_class}, {case_acuity}
+    "PREPARATION": (
+        "ANESTHESIA: {anesthesia_type}\n"
+        "ESTIMATED BLOOD LOSS: {ebl}\n"
+        "SPECIMEN: {specimen}\n"
+        "WOUND CLASSIFICATION: {wound_class}\n"
+        "CASE ACUITY: {case_acuity}"
+    ),
+
     # {robot_type}: "dv5", "Xi" (setup config)
     "BOILERPLATE_SETUP": (
         "After informed consent was obtained, the patient was brought to the operating room "
@@ -208,7 +223,7 @@ PARAGRAPHS = {
 
     # {tif_doctor_name}: free text
     "TIF": (
-        "TRANSLUMINAL INCISIONLESS FUNDOPLICATION:\n"
+        "TRANSORAL INCISIONLESS FUNDOPLICATION:\n"
         "Please refer to Dr {tif_doctor_name}'s note for the TIF.\n\n"
         "The device and the scope were withdrawn. A completion EGD showed the "
         "presence of an excellent subdiaphragmatic fundoplication."
@@ -248,6 +263,12 @@ PARAGRAPHS = {
         "duration of {typical_duration_mins} minutes."
     ),
 
+    # {return_reason}: free text (e.g. "postoperative bleeding", "mesh slippage", "wrap herniation")
+    "MODIFIER_78_UNPLANNED_RETURN": (
+        "This procedure represents an unplanned return to the operating room for "
+        "a related problem: {return_reason}."
+    ),
+
     # {assistant_doctor_name}: free text
     "MODIFIER_82_ATTESTATION": (
         "Dr. {assistant_doctor_name} served as assistant surgeon. This procedure was "
@@ -260,7 +281,11 @@ PARAGRAPHS = {
         "was removed. The trocars were removed under direct visualization and the abdomen was "
         "desufflated. Skin was closed using 4-0 monocryl. All instrument and sponge counts were "
         "correct X2.\n\n"
-        "I thank you for involving me in this patient's care."
+    ),
+
+    # {disposition}: dropdown + free text
+    "DISPOSITION": (
+        "DISPOSITION: {disposition}"
     ),
 
 }

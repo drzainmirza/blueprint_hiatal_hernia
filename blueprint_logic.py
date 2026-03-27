@@ -36,7 +36,7 @@ if MODEL detects any fundoplication OR SURGEON toggles "tif_performed" ON:
         "Barrett's esophagus without dysplasia [K22.70]"
         "Other" → free text
 
-if MODEL detects "5.1_Cruroplasty":
+if MODEL detects "5.1_Cruroplasty" OR "hernia reduction step":
     detected_procedures append "HIATAL_HERNIA_REPAIR"
     SURGEON picks {hernia_diagnosis} from:
         "Diaphragmatic hernia, no obstruction or gangrene [K44.9]"
@@ -50,11 +50,31 @@ if MODEL detects "7.1_Hellers_Myotomy":
         "Achalasia of cardia [K22.0]"
         "Other" → free text
 
+if MODEL detects "4.1_Collis_Gastroplasty":
+    detected_procedures append "COLLIS_GASTROPLASTY"
+    SURGEON picks {collis_diagnosis} from:
+        "Diaphragmatic hernia without obstruction or gangrene [K44.9] + Other specified disease of esophagus [K22.89]"
+        "Diaphragmatic hernia with obstruction, without gangrene [K44.0] + Other specified disease of esophagus [K22.89]"
+        "Esophageal obstruction/stricture [K22.2] + GERD with esophagitis [K21.00]"
+        "Esophageal obstruction/stricture [K22.2] + GERD without esophagitis [K21.9]"
+        "Postprocedural complications of digestive system [K91.89] + Diaphragmatic hernia [K44.9]"
+        "Other" → free text
+
 if MODEL detects "12.1_LINX_Reflux_Management_System":
     detected_procedures append "LINX"
     SURGEON picks {linx_diagnosis} from:
         "GERD without esophagitis [K21.9]"
         "GERD with esophagitis, without bleeding [K21.00]"
+        "Other" → free text
+
+if MODEL detects "9.1_Pyloroplasty":
+    detected_procedures append "PYLOROPLASTY"
+    SURGEON picks {pyloroplasty_diagnosis} from:
+        "Gastroparesis [K31.84]"
+        "Type 2 DM with diabetic autonomic neuropathy [E11.43] + Gastroparesis [K31.84]"
+        "Type 1 DM with diabetic autonomic neuropathy [E10.43] + Gastroparesis [K31.84]"
+        "Disorders of vagus nerve [G52.2]"
+        "Postgastric surgery syndromes [K91.1]"
         "Other" → free text
 
 include PREOP_DIAGNOSIS paragraph         # lists all selected diagnoses + ICD-10 codes

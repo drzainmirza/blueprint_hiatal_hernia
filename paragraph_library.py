@@ -1,25 +1,12 @@
 """
-UNCOVR Paragraph Library — v0.2
-================================
-Paragraphs keyed by section name.
-
-Sections that have {placeholders} are surgeon dropdowns.
-The OPTIONS comment above each paragraph lists exactly what
-can go in each placeholder — the surgeon picks from these.
-
-INPUT SOURCES:
-  - "setup config" = configured once before the app is used (e.g. robot type)
-  - "surgeon dropdown" = selected per case in the UI
-  - "model detected" = auto-detected from surgical video
-  - "surgeon toggle" = binary on/off button in UI (e.g. TIF happened)
-  - "surgeon complication" = selected from complications dropdown (multi-select)
+UNCOVR Paragraph Library
+========================
+Paragraphs keyed by section name. {placeholders} are filled from surgeon inputs.
 """
 
 PARAGRAPHS = {
 
-    # ── SETUP CONFIG ─────────────────────────────────────────────────────
-    # {robot_type}: "dv5" or "Xi"  (setup config — set once before app use)
-
+    # {robot_type}: "dv5", "Xi" (setup config)
     "BOILERPLATE_SETUP": (
         "After informed consent was obtained, the patient was brought to the operating room "
         "and positioned on the operating room table in a supine position. The site, location "
@@ -37,20 +24,13 @@ PARAGRAPHS = {
         "retractor. A vessel sealer, monopolar scissors, cadiere and a fenestrated bipolar instrument."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {sliding_cm}  : "2", "3", "4", "5"
-    # {hill_grade}  : "II", "III", "IV"
-    # {egd_extra}   : "" (nothing), "Significant erosive esophagitis was noted in the distal esophagus.",
-    #                 "LA grade C esophagitis was identified.",
-    #                 "Long segment Barrett's disease was noted in the distal esophagus."
-
+    # {sliding_cm}: "2","3","4","5"  |  {hill_grade}: "II","III","IV"
+    # {egd_extra}: "" / "Significant erosive esophagitis..." / "LA grade C..." / "Long segment Barrett's..."
     "EGD_INITIAL": (
         "EGD: upper endoscopy revealed the presence of a {sliding_cm} cm sliding component "
         "with a paraesophageal component and a Hill Grade {hill_grade} valve. "
         "The pylorus was also intubated and the proximal duodenum evaluated. {egd_extra}"
     ),
-
-    # ── No dropdowns — fully static — model detected ────────────────────
 
     "LYSIS_OF_ADHESIONS": (
         "LYSIS OF ADHESIONS:\n"
@@ -58,10 +38,8 @@ PARAGRAPHS = {
         "sharp dissection. This allowed for adequate visualization of the hiatal region."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {hernia_size} : "small", "moderate sized", "small to moderate sized", "giant"
-    # {esoph_length}: "2", "3", "3.5", "4", "5"
-
+    # {hernia_size}: "small","moderate sized","small to moderate sized","giant"
+    # {esoph_length}: "2","3","3.5","4","5"
     "HIATAL_DISSECTION": (
         "HIATAL DISSECTION:\n"
         "We began our dissection by dividing the pars flaccida preserving the hepatic branch of "
@@ -79,9 +57,7 @@ PARAGRAPHS = {
         "mobilized at the hiatus."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {effraction_side}: "left", "right", "bilateral"
-
+    # {effraction_side}: "left","right","bilateral"
     "PLEURAL_EFFRACTION": (
         "PLEURAL EFFRACTION:\n"
         "During the hiatal dissection, a {effraction_side} pleurotomy was created. "
@@ -89,10 +65,8 @@ PARAGRAPHS = {
         "a tension pneumothorax."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {vagus_branch}        : "anterior", "posterior", "hepatic branch of the anterior"
-    # {vagus_injury_extent} : "partially transected", "fully transected", "stretched but intact"
-
+    # {vagus_branch}: "anterior","posterior","hepatic branch of the anterior"
+    # {vagus_injury_extent}: "partially transected","fully transected","stretched but intact"
     "VAGUS_NERVE_TRAUMA": (
         "VAGUS NERVE INJURY:\n"
         "During dissection, an injury to the {vagus_branch} vagus nerve was identified. "
@@ -100,14 +74,7 @@ PARAGRAPHS = {
         "This was documented and the remainder of the procedure was continued."
     ),
 
-    # ── SURGEON COMPLICATION DROPDOWN ─────────────────────────────────────
-    # These are NOT model-detected. Surgeon selects from a multi-select
-    # complications dropdown in the UI. Zero or more can be selected.
-    #
-    # Available complications:
-    #   "STOMACH_INJURY"    — gastric serosal/full-thickness injury
-    #   "SPLENIC_INJURY"    — splenic laceration or decapsulization
-    #   "ESOPHAGEAL_INJURY" — esophageal perforation or thermal injury
+    # ── Surgeon-indicated complications (multi-select dropdown) ───────────
 
     "STOMACH_INJURY": (
         "COMPLICATION — GASTRIC INJURY:\n"
@@ -130,9 +97,7 @@ PARAGRAPHS = {
         "A leak test was performed and confirmed no extravasation."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {collis_neo_length}: "3", "4", "5"
-
+    # {collis_neo_length}: "3","4","5"
     "COLLIS_GASTROPLASTY": (
         "COLLIS GASTROPLASTY:\n"
         "Due to inadequate intra-abdominal esophageal length, a Collis gastroplasty "
@@ -143,10 +108,7 @@ PARAGRAPHS = {
         "Adequate intra-abdominal esophageal length was now achieved."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {mesh_size}   : "7x5cm", "7x10cm", "10x15cm"
-    # {esoph_length}: "2", "3", "3.5", "4", "5"
-
+    # {mesh_size}: "7x5cm","7x10cm","10x15cm"  |  {esoph_length}: shared
     "HERNIA_REPAIR_WITH_MESH": (
         "PARAESOPHAGEAL HERNIA REPAIR:\n"
         "As our protocol to measure tension at closure of the crura on the dv5 using force "
@@ -160,8 +122,6 @@ PARAGRAPHS = {
         "There was {esoph_length} cm of subdiaphragmatic esophageal length."
     ),
 
-    # ── No dropdowns — fully static ───────────────────────────────────────
-
     "HERNIA_REPAIR_NO_MESH": (
         "PARAESOPHAGEAL HERNIA REPAIR:\n"
         "As our protocol to measure tension at closure of the crura on the dv5 using force "
@@ -172,9 +132,7 @@ PARAGRAPHS = {
         "The repair was performed with running 0 permanent vlok suture and run back."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {myotomy_gastric_cm}: "1.5", "2", "2.5", "3"
-
+    # {myotomy_gastric_cm}: "1.5","2","2.5","3"
     "HELLERS_MYOTOMY": (
         "HELLER'S MYOTOMY:\n"
         "An anterior esophageal myotomy was performed. The longitudinal and circular "
@@ -183,8 +141,6 @@ PARAGRAPHS = {
         "The mucosa was confirmed to be intact and bulging appropriately through the "
         "myotomy site. Hemostasis was achieved."
     ),
-
-    # ── No dropdowns — fully static ───────────────────────────────────────
 
     "TOUPET_FUNDOPLICATION": (
         "TOUPET FUNDOPLICATION:\n"
@@ -218,8 +174,6 @@ PARAGRAPHS = {
         "fundus. Endoscopically a decent anterior fundoplication was confirmed."
     ),
 
-    # ── No dropdowns — fully static ───────────────────────────────────────
-
     "PYLOROPLASTY": (
         "PYLOROPLASTY:\n"
         "The pylorus was identified by looking for the prepyloric vein, the branches "
@@ -235,10 +189,7 @@ PARAGRAPHS = {
         "with no leak."
     ),
 
-    # ── OPTIONS — surgeon toggle ────────────────────────────────────────
-    # TIF is enabled via a separate button in the UI (not model-detected).
-    # {tif_doctor_name}: free text or dropdown of known GI doctors
-
+    # {tif_doctor_name}: free text
     "TIF": (
         "TRANSLUMINAL INCISIONLESS FUNDOPLICATION:\n"
         "Please refer to Dr {tif_doctor_name}'s note for the TIF.\n\n"
@@ -246,10 +197,7 @@ PARAGRAPHS = {
         "presence of an excellent subdiaphragmatic fundoplication."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {linx_sizer_mm}  : "11", "13", "14"
-    # {linx_device_mm} : "14", "16", "17"
-
+    # {linx_sizer_mm}: "11","13","14"  |  {linx_device_mm}: "14","16","17"
     "LINX_IMPLANTATION": (
         "LINX IMPLANTATION:\n"
         "Using the sizer the distal esophagus at the level of the GEJ/LES just above "
@@ -260,24 +208,27 @@ PARAGRAPHS = {
         "and clasped anteriorly. The LINX was freely (but not excessively) mobile."
     ),
 
-    # ── OPTIONS ───────────────────────────────────────────────────────────
-    # {egd_completion_finding}:
-    #   "A completion EGD confirmed an excellent subdiaphragmatic fundoplication."
-    #   "A completion EGD confirmed a viable distal esophagus and stomach as well as a posterior fundoplication."
-    #   "A completion EGD confirmed the presence of a subdiaphragmatic GEJ."
-
+    # {egd_completion_finding}: "A completion EGD confirmed an excellent subdiaphragmatic fundoplication."
+    #   / "...viable distal esophagus and stomach as well as a posterior fundoplication."
+    #   / "...the presence of a subdiaphragmatic GEJ."
     "EGD_COMPLETION": (
         "The endoscope was removed after confirming the presence of a \"stacked coin\" appearance "
         "to the fundoplication. {egd_completion_finding}"
     ),
 
-    # ── No dropdowns — model detected ───────────────────────────────────
-
     "DRAIN_PLACEMENT": (
         "A drain was placed posterior to the fundoplication."
     ),
 
-    # ── No dropdowns — fully static ───────────────────────────────────────
+    # {modifier_22_reason}: see MODIFIER_22_REASONS in blueprint.py
+    # {modifier_22_extra_mins}: surgeon input (minutes of extra time)
+    # {typical_duration_mins}: from setup config
+    "MODIFIER_22": (
+        "MODIFIER 22: this case qualifies for a modifier 22 due to "
+        "{modifier_22_reason}. This increment of work required an additional "
+        "{modifier_22_extra_mins} minutes beyond the typical procedure duration "
+        "of {typical_duration_mins} minutes."
+    ),
 
     "CLOSURE": (
         "The instruments were centralized and removed. The robot was undocked. The liver retractor "

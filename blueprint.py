@@ -1,123 +1,60 @@
 """
-UNCOVR Blueprint Routing — v0.1
-================================
-Takes model predictions + surgeon dropdown selections,
-returns an assembled operative note.
+UNCOVR Blueprint Routing
+========================
+Takes model predictions + surgeon inputs → assembled operative note.
 """
 
 from paragraph_library import PARAGRAPHS
 
 
-# ── STEP 1: Paste model outputs here ──────────────────────────────────────
-#
-# The model watches the surgical video and outputs a confidence score (0.0–1.0)
-# for each step it detected. Paste that output dict here.
-#
-# Example:
-#   MODEL_OUTPUT_STEPS = {
-#       "1.10_Intraoperative_Endoscopy":       0.91,
-#       "2.4_Hiatal_&_Oesophageal_Dissection": 0.95,
-#       "5.1_Cruroplasty":                     0.93,
-#       "6.1_Mesh_Placement":                  0.87,
-#       "8.3_Fundoplication_Toupet":           0.89,
-#   }
-
-MODEL_OUTPUT_STEPS = {
-    # paste model output here
-}
-
-
-# ── STEP 2: Surgeon dropdown selections ───────────────────────────────────
-#
-# These are the values the surgeon picks from dropdowns in the UI.
-# Each key matches a {placeholder} in the paragraph library.
-# Options for each are listed in the paragraph_library.py comments.
-
-# ── SETUP CONFIG ─────────────────────────────────────────────────────────
-# These are configured once before the app is used (not per-case).
+# ═══════════════════════════════════════════════════════════════════════════
+# INPUTS
+# ═══════════════════════════════════════════════════════════════════════════
 
 SETUP_CONFIG = {
-    "robot_type": "dv5",          # options: "dv5", "Xi"
+    "robot_type": "dv5",                # "dv5", "Xi"
+    "typical_duration_mins": "90",      # typical operation duration in minutes
 }
 
 SURGEON_INPUTS = {
-
-    # EGD_INITIAL dropdowns
-    "sliding_cm":   "4",        # options: "2", "3", "4", "5"
-    "hill_grade":   "IV",       # options: "II", "III", "IV"
-    "egd_extra":    "",         # options: "" / "Significant erosive esophagitis was noted in the distal esophagus."
-                                #          "LA grade C esophagitis was identified."
-                                #          "Long segment Barrett's disease was noted in the distal esophagus."
-
-    # HIATAL_DISSECTION dropdowns
-    "hernia_size":  "moderate sized",   # options: "small" / "moderate sized" / "small to moderate sized" / "giant"
-    "esoph_length": "4",                # options: "2", "3", "3.5", "4", "5"
-
-    # HERNIA_REPAIR_WITH_MESH dropdowns
-    "mesh_size":    "7x5cm",    # options: "7x5cm", "7x10cm", "10x15cm"
-    # note: esoph_length above is shared with hiatal dissection
-
-    # COLLIS_GASTROPLASTY dropdown
-    "collis_neo_length": "4",              # options: "3", "4", "5"
-
-    # HELLERS_MYOTOMY dropdown
-    "myotomy_gastric_cm": "2",             # options: "1.5", "2", "2.5", "3"
-
-    # PLEURAL_EFFRACTION dropdown
-    "effraction_side": "left",             # options: "left", "right", "bilateral"
-
-    # VAGUS_NERVE_TRAUMA dropdowns
-    "vagus_branch": "anterior",            # options: "anterior", "posterior",
-                                           #          "hepatic branch of the anterior"
-    "vagus_injury_extent": "stretched but intact",
-                                           # options: "partially transected",
-                                           #          "fully transected",
-                                           #          "stretched but intact"
-
-    # TIF dropdown (only shown when TIF button is toggled on)
-    "tif_doctor_name": "Ramzan",  # free text or dropdown of known GI doctors
-
-    # LINX_IMPLANTATION dropdowns
-    "linx_sizer_mm":  "13",       # options: "11", "13", "14"
-    "linx_device_mm": "16",       # options: "14", "16", "17"
-
-    # COMPLICATIONS — surgeon multi-select dropdown (NOT model-detected)
-    # Surgeon selects zero or more from this list:
-    #   "STOMACH_INJURY"    — gastric serosal/full-thickness injury
-    #   "SPLENIC_INJURY"    — splenic laceration or decapsulization
-    #   "ESOPHAGEAL_INJURY" — esophageal perforation or thermal injury
-    "complications": [],
-
-    # EGD_COMPLETION dropdown
-    "egd_completion_finding": "A completion EGD confirmed an excellent subdiaphragmatic fundoplication.",
-    # options:
-    #   "A completion EGD confirmed an excellent subdiaphragmatic fundoplication."
-    #   "A completion EGD confirmed a viable distal esophagus and stomach as well as a posterior fundoplication."
-    #   "A completion EGD confirmed the presence of a subdiaphragmatic GEJ."
+    "sliding_cm":               "4",
+    "hill_grade":               "IV",
+    "egd_extra":                "",
+    "hernia_size":              "moderate sized",
+    "esoph_length":             "4",
+    "mesh_size":                "7x5cm",
+    "collis_neo_length":        "4",
+    "myotomy_gastric_cm":       "2",
+    "effraction_side":          "left",
+    "vagus_branch":             "anterior",
+    "vagus_injury_extent":      "stretched but intact",
+    "tif_doctor_name":          "",
+    "linx_sizer_mm":            "13",
+    "linx_device_mm":           "16",
+    "complications":            [],
+    "modifier_22_reason":       "",
+    "modifier_22_extra_mins":   "",
+    "egd_completion_finding":   "A completion EGD confirmed an excellent subdiaphragmatic fundoplication.",
 }
-
-# ── SURGEON TOGGLES ──────────────────────────────────────────────────────
-# Binary on/off buttons in the UI (not model-detected, not dropdowns).
 
 SURGEON_TOGGLES = {
-    "tif_performed": False,       # separate button in UI for TIF
+    "tif_performed": False,
+    "modifier_22":   False,
 }
 
+MODIFIER_22_REASONS = [
+    "the unusual amount of additional work needed to secure the outcome",
+    "the additional work needed for the reoperative nature of the surgery",
+    "significant adhesive disease requiring extensive lysis of adhesions",
+    "morbid obesity complicating the procedure",
+    "conversion from laparoscopic to open approach",
+    "excessive blood loss requiring additional hemostatic measures",
+]
 
-# ── Confidence threshold ───────────────────────────────────────────────────
-#
-# detected() answers: "did the model see this step?"
-#
-# It looks up the label in MODEL_OUTPUT_STEPS and checks if the confidence
-# is at or above THRESHOLD (0.5). If the label isn't in the dict at all,
-# it defaults to 0.0 (not detected).
-#
-# Example:
-#   detected(steps, "6.1_Mesh_Placement")
-#   → looks up "6.1_Mesh_Placement" → finds 0.87 → 0.87 >= 0.5 → True  (mesh was placed)
-#
-#   detected(steps, "8.2_Fundoplication_Nissen")
-#   → label not in dict → defaults to 0.0 → 0.0 >= 0.5 → False  (Nissen not performed)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DETECTION
+# ═══════════════════════════════════════════════════════════════════════════
 
 THRESHOLD = 0.5
 
@@ -125,22 +62,23 @@ def detected(steps, label):
     return steps.get(label, 0.0) >= THRESHOLD
 
 
-# ── STEP 3: Routing logic ──────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+# ROUTING
+# ═══════════════════════════════════════════════════════════════════════════
+
+FUNDO_LABELS = [
+    "8.3_Fundoplication_Toupet",
+    "8.2_Fundoplication_Nissen",
+    "8.4_Fundoplication_Dor",
+]
+
+VALID_BASE_CODES_FOR_COLLIS = {"43280", "43281", "43282"}
+
 
 def get_paragraphs(steps, toggles=None, inputs=None):
-    """
-    Build the ordered list of paragraph keys for the op note.
-
-    Args:
-        steps:   model detection dict  {label: confidence}
-        toggles: surgeon toggle dict   {"tif_performed": bool, ...}
-        inputs:  surgeon inputs dict   (used here only to read "complications" list)
-    """
-    if toggles is None:
-        toggles = {}
-    if inputs is None:
-        inputs = {}
-
+    """Build ordered list of paragraph keys for the op note."""
+    toggles = toggles or {}
+    inputs = inputs or {}
     keys = []
 
     keys.append("BOILERPLATE_SETUP")
@@ -148,25 +86,23 @@ def get_paragraphs(steps, toggles=None, inputs=None):
     if detected(steps, "1.10_Intraoperative_Endoscopy"):
         keys.append("EGD_INITIAL")
 
-    # Lysis of adhesions (model-detected, before hiatal dissection)
     if detected(steps, "1.5_Lysis_of_Adhesions"):
         keys.append("LYSIS_OF_ADHESIONS")
 
     if detected(steps, "2.4_Hiatal_&_Oesophageal_Dissection"):
         keys.append("HIATAL_DISSECTION")
 
-    # Model-detected complications during dissection
+    # Model-detected complications
     if detected(steps, "C.1_Pleural_Effraction"):
         keys.append("PLEURAL_EFFRACTION")
     if detected(steps, "C.2_Vagus_Nerve_Trauma"):
         keys.append("VAGUS_NERVE_TRAUMA")
 
-    # Surgeon-indicated complications (multi-select dropdown)
+    # Surgeon-indicated complications
     for complication in inputs.get("complications", []):
         if complication in PARAGRAPHS:
             keys.append(complication)
 
-    # Esophageal lengthening (before crural closure)
     if detected(steps, "4.1_Collis_Gastroplasty"):
         keys.append("COLLIS_GASTROPLASTY")
 
@@ -176,7 +112,6 @@ def get_paragraphs(steps, toggles=None, inputs=None):
         else:
             keys.append("HERNIA_REPAIR_NO_MESH")
 
-    # Myotomy before fundoplication
     if detected(steps, "7.1_Hellers_Myotomy"):
         keys.append("HELLERS_MYOTOMY")
 
@@ -188,11 +123,9 @@ def get_paragraphs(steps, toggles=None, inputs=None):
     elif detected(steps, "8.4_Fundoplication_Dor"):
         keys.append("DOR_FUNDOPLICATION")
 
-    # Gastric drainage after fundoplication
     if detected(steps, "9.1_Pyloroplasty"):
         keys.append("PYLOROPLASTY")
 
-    # TIF — surgeon toggle (separate button in UI)
     if toggles.get("tif_performed", False):
         keys.append("TIF")
 
@@ -202,36 +135,58 @@ def get_paragraphs(steps, toggles=None, inputs=None):
     if detected(steps, "1.10_Intraoperative_Endoscopy"):
         keys.append("EGD_COMPLETION")
 
-    # Drain placement (model-detected from video)
     if detected(steps, "11.1_Drain_Placement"):
         keys.append("DRAIN_PLACEMENT")
+
+    # Modifier 22 — must pass the 25% time threshold check
+    if toggles.get("modifier_22", False):
+        if _modifier_22_qualifies(inputs, SETUP_CONFIG):
+            keys.append("MODIFIER_22")
 
     keys.append("CLOSURE")
 
     return keys
 
 
-# ── STEP 4: CPT codes ─────────────────────────────────────────────────────
+def _modifier_22_qualifies(inputs, setup):
+    """
+    Modifier 22 requires:
+    1. Extra time > 25% of typical procedure duration
+    2. A documented reason (medical necessity)
+    3. The extra time on the specific thing is clearly stated
+    """
+    try:
+        extra = float(inputs.get("modifier_22_extra_mins", 0))
+        typical = float(setup.get("typical_duration_mins", 0))
+    except (ValueError, TypeError):
+        return False
+
+    if typical <= 0 or extra <= 0:
+        return False
+
+    has_reason = bool(inputs.get("modifier_22_reason", "").strip())
+    exceeds_threshold = extra > (typical * 0.25)
+
+    return exceeds_threshold and has_reason
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CPT CODES
+# ═══════════════════════════════════════════════════════════════════════════
 #
-# 43280 — Laparoscopic fundoplication (standalone, NO hernia repair)
-#          Do NOT use with 43279, 43281, or 43282.
-# 43281 — Laparoscopic hiatal hernia repair ± fundoplication, NO mesh
-# 43282 — Laparoscopic hiatal hernia repair ± fundoplication, WITH mesh
-# 43283 — Collis gastroplasty (ADD-ON code, must accompany 43280/43281/43282)
+# 43280 — Lap fundoplication (standalone, NOT with 43279/43281/43282)
+# 43281 — Lap hiatal hernia repair ± fundo, NO mesh
+# 43282 — Lap hiatal hernia repair ± fundo, WITH mesh
+# 43283 — Collis gastroplasty (ADD-ON, requires 43280/43281/43282)
 
-FUNDO_LABELS = [
-    "8.3_Fundoplication_Toupet",
-    "8.2_Fundoplication_Nissen",
-    "8.4_Fundoplication_Dor",
-]
-
-VALID_BASE_CODES_FOR_COLLIS = {"43280", "43281", "43282"}
-
-def get_cpt_codes(steps):
+def get_cpt_codes(steps, toggles=None, inputs=None, setup=None):
     """
-    Returns a list of dicts: [{"code": "43282", "type": "primary"}, ...]
-    type is either "primary" or "add-on".
+    Returns list of dicts: [{"code": "43282", "type": "primary"}, ...]
+    Types: "primary", "add-on". Modifier 22 appends "-22" to primary codes.
     """
+    toggles = toggles or {}
+    inputs = inputs or {}
+    setup = setup or {}
     codes = []
 
     has_cruroplasty = detected(steps, "5.1_Cruroplasty")
@@ -244,22 +199,28 @@ def get_cpt_codes(steps):
         else:
             codes.append({"code": "43281", "type": "primary"})
     elif has_fundo:
-        # Fundoplication without hernia repair → 43280
         codes.append({"code": "43280", "type": "primary"})
 
-    # Add-on codes
+    # Add-on: Collis requires a base code
     if detected(steps, "4.1_Collis_Gastroplasty"):
         base_codes = {c["code"] for c in codes}
-        if base_codes & VALID_BASE_CODES_FOR_COLLIS: # essentially IF the valid codes are present in this case THEN do the below
+        if base_codes & VALID_BASE_CODES_FOR_COLLIS:
             codes.append({"code": "43283", "type": "add-on"})
+
+    # Modifier 22 — append "-22" to primary codes if qualified
+    if toggles.get("modifier_22", False) and _modifier_22_qualifies(inputs, setup):
+        for c in codes:
+            if c["type"] == "primary":
+                c["code"] = c["code"] + "-22"
 
     return codes
 
 
-# ── STEP 5: Assemble note ──────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+# ASSEMBLE NOTE
+# ═══════════════════════════════════════════════════════════════════════════
 
 def assemble_note(keys, inputs, cpt_codes=None, setup=None):
-    # Merge setup config into inputs so {robot_type} etc. get filled
     all_inputs = {}
     if setup:
         all_inputs.update(setup)
@@ -270,11 +231,10 @@ def assemble_note(keys, inputs, cpt_codes=None, setup=None):
         if k not in PARAGRAPHS:
             continue
         text = PARAGRAPHS[k]
-        # Fill in any placeholders with surgeon dropdown selections
         try:
             text = text.format(**all_inputs)
         except KeyError:
-            pass  # if a placeholder has no matching input, leave it as-is
+            pass
         paragraphs.append(text)
 
     note = "\n\n".join(paragraphs)
@@ -292,9 +252,17 @@ def assemble_note(keys, inputs, cpt_codes=None, setup=None):
     return note
 
 
-# ── Quick test ─────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS
+# ═══════════════════════════════════════════════════════════════════════════
+
 if __name__ == "__main__":
-    MODEL_OUTPUT_STEPS = {
+
+    # ── Test 1: Standard case ─────────────────────────────────────────────
+    print("TEST 1: Standard hiatal hernia repair with mesh + Toupet")
+    print("=" * 60)
+
+    test1_steps = {
         "1.10_Intraoperative_Endoscopy":       0.91,
         "2.4_Hiatal_&_Oesophageal_Dissection": 0.95,
         "5.1_Cruroplasty":                     0.93,
@@ -302,14 +270,16 @@ if __name__ == "__main__":
         "8.3_Fundoplication_Toupet":           0.89,
     }
 
-    keys = get_paragraphs(MODEL_OUTPUT_STEPS, SURGEON_TOGGLES, SURGEON_INPUTS)
-    cpt_codes = get_cpt_codes(MODEL_OUTPUT_STEPS)
-    print("Sections selected:", keys)
-    print("CPT codes:", cpt_codes)
+    keys = get_paragraphs(test1_steps, SURGEON_TOGGLES, SURGEON_INPUTS)
+    cpt = get_cpt_codes(test1_steps, SURGEON_TOGGLES, SURGEON_INPUTS, SETUP_CONFIG)
+    print("Sections:", keys)
+    print("CPT:", cpt)
     print()
-    print(assemble_note(keys, SURGEON_INPUTS, cpt_codes, SETUP_CONFIG))
+    print(assemble_note(keys, SURGEON_INPUTS, cpt, SETUP_CONFIG))
+
+    # ── Test 2: Redo case with modifier 22 ────────────────────────────────
     print("\n" + "=" * 60)
-    print("TEST 2: Redo case with TIF, adhesions, drain, complication")
+    print("TEST 2: Redo case — TIF, adhesions, drain, splenic injury, mod 22")
     print("=" * 60 + "\n")
 
     test2_steps = {
@@ -321,13 +291,31 @@ if __name__ == "__main__":
         "6.1_Mesh_Placement":                  0.87,
         "11.1_Drain_Placement":                0.90,
     }
-    test2_toggles = {"tif_performed": True}
+    test2_toggles = {"tif_performed": True, "modifier_22": True}
     test2_inputs = dict(SURGEON_INPUTS)
     test2_inputs["complications"] = ["SPLENIC_INJURY"]
+    test2_inputs["modifier_22_reason"] = "the additional work needed for the reoperative nature of the surgery"
+    test2_inputs["modifier_22_extra_mins"] = "45"
 
     keys2 = get_paragraphs(test2_steps, test2_toggles, test2_inputs)
-    cpt2 = get_cpt_codes(test2_steps)
-    print("Sections selected:", keys2)
-    print("CPT codes:", cpt2)
+    cpt2 = get_cpt_codes(test2_steps, test2_toggles, test2_inputs, SETUP_CONFIG)
+    print("Sections:", keys2)
+    print("CPT:", cpt2)
     print()
     print(assemble_note(keys2, test2_inputs, cpt2, SETUP_CONFIG))
+
+    # ── Test 3: Modifier 22 rejected — extra time below 25% ──────────────
+    print("\n" + "=" * 60)
+    print("TEST 3: Modifier 22 toggled ON but only 10 min extra (below 25% of 90)")
+    print("=" * 60 + "\n")
+
+    test3_inputs = dict(SURGEON_INPUTS)
+    test3_inputs["modifier_22_reason"] = "morbid obesity complicating the procedure"
+    test3_inputs["modifier_22_extra_mins"] = "10"
+    test3_toggles = {"tif_performed": False, "modifier_22": True}
+
+    keys3 = get_paragraphs(test1_steps, test3_toggles, test3_inputs)
+    cpt3 = get_cpt_codes(test1_steps, test3_toggles, test3_inputs, SETUP_CONFIG)
+    print("Sections:", keys3)
+    print("CPT:", cpt3)
+    print("(Modifier 22 should NOT appear — 10 min is not > 25% of 90 min)")

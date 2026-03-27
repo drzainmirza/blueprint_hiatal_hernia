@@ -6,6 +6,23 @@ Paragraphs keyed by section name. {placeholders} are filled from surgeon inputs.
 
 PARAGRAPHS = {
 
+    # {preop_diagnoses}: auto-built from surgeon dropdown selections, one line per diagnosis
+    "PREOP_DIAGNOSIS": (
+        "PREPROCEDURE DIAGNOSIS:\n"
+        "{preop_diagnoses}"
+    ),
+
+    # defaults to "Same" unless surgeon overrides
+    "POSTOP_DIAGNOSIS": (
+        "POSTPROCEDURE DIAGNOSIS: Same"
+    ),
+
+    # {procedures_list}: auto-built from detected procedures, one line per procedure
+    "PROCEDURES_PERFORMED": (
+        "PROCEDURE:\n"
+        "{procedures_list}"
+    ),
+
     # {robot_type}: "dv5", "Xi" (setup config)
     "BOILERPLATE_SETUP": (
         "After informed consent was obtained, the patient was brought to the operating room "
@@ -220,14 +237,22 @@ PARAGRAPHS = {
         "A drain was placed posterior to the fundoplication."
     ),
 
-    # {modifier_22_reason}: see MODIFIER_22_REASONS in blueprint.py
-    # {modifier_22_extra_mins}: surgeon input (minutes of extra time)
+    # {modifier_22_reason}: dropdown — see options in blueprint_logic.py
+    # {modifier_22_step}: what step/thing caused extra time
+    # {modifier_22_mins}: minutes on that specific step
     # {typical_duration_mins}: from setup config
     "MODIFIER_22": (
         "MODIFIER 22: this case qualifies for a modifier 22 due to "
-        "{modifier_22_reason}. This increment of work required an additional "
-        "{modifier_22_extra_mins} minutes beyond the typical procedure duration "
-        "of {typical_duration_mins} minutes."
+        "{modifier_22_reason}. The additional work involved {modifier_22_step} "
+        "which required {modifier_22_mins} minutes beyond the typical procedure "
+        "duration of {typical_duration_mins} minutes."
+    ),
+
+    # {assistant_doctor_name}: free text
+    "MODIFIER_82_ATTESTATION": (
+        "Dr. {assistant_doctor_name} served as assistant surgeon. This procedure was "
+        "performed in a teaching facility; no qualified resident surgeon was available "
+        "to assist."
     ),
 
     "CLOSURE": (

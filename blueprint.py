@@ -67,6 +67,10 @@ SURGEON_INPUTS = {
                                            #          "fully transected",
                                            #          "stretched but intact"
 
+    # LINX_IMPLANTATION dropdowns
+    "linx_sizer_mm":  "13",       # options: "11", "13", "14"
+    "linx_device_mm": "16",       # options: "14", "16", "17"
+
     # EGD_COMPLETION dropdown
     "egd_completion_finding": "A completion EGD confirmed an excellent subdiaphragmatic fundoplication.",
     # options:

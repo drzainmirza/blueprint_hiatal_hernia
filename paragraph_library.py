@@ -68,11 +68,9 @@ PARAGRAPHS = {
 
     "PLEURAL_EFFRACTION": (
         "PLEURAL EFFRACTION:\n"
-        "During the hiatal dissection, a {effraction_side} pleural effraction was noted. "
-        "A red rubber catheter was passed through the defect into the chest and the "
-        "pneumothorax was evacuated by the anesthesia team with a series of Valsalva "
-        "maneuvers. The defect was closed primarily. End-tidal CO2 was monitored and "
-        "confirmed to normalize."
+        "During the hiatal dissection, a {effraction_side} pleurotomy was created. "
+        "This pleural defect was expanded to create an open pneumothorax to prevent "
+        "a tension pneumothorax."
     ),
 
     # ── OPTIONS ───────────────────────────────────────────────────────────
@@ -169,28 +167,40 @@ PARAGRAPHS = {
 
     "DOR_FUNDOPLICATION": (
         "DOR FUNDOPLICATION:\n"
-        "An anterior 180-degree Dor fundoplication was performed. The anterior wall of the gastric "
-        "fundus was sutured to the right and left edges of the esophagus and to the crura using "
-        "2-0 Ethibond sutures. The wrap was confirmed to lie flat against the anterior esophagus "
-        "without tension."
+        "A Dor fundoplication was fashioned with a total of 6 interrupted 2-0 ethibond "
+        "sutures allowing for a 180 anterior fundoplication by using the now freed "
+        "fundus. Endoscopically a decent anterior fundoplication was confirmed."
     ),
 
     # ── No dropdowns — fully static ───────────────────────────────────────
 
     "PYLOROPLASTY": (
         "PYLOROPLASTY:\n"
-        "A Heineke-Mikulicz pyloroplasty was performed. The pylorus was identified "
-        "and a longitudinal incision was made across the pyloric channel. The incision "
-        "was closed transversely using 2-0 Vicryl sutures in an interrupted fashion, "
-        "widening the pyloric channel. The closure was inspected and confirmed "
-        "to be patent and hemostatic."
+        "The pylorus was identified by looking for the prepyloric vein, the branches "
+        "of the anterior vagus (crows feet) and palpating the ring of muscle as well "
+        "as endoscopically. The monopolar scissors was used to enter the distal antrum. "
+        "The division of the wall and the pyloric ring continued in a linear "
+        "(longitudinal fashion) until the enterotomy was 5 cm long, equally on the "
+        "stomach and pylorus. The pylorus was closed using the Heineke-Mikulicz fashion "
+        "using a single 3-0 absorbable vlok suture in a running fashion starting in the "
+        "cephalad side (lesser curvature) running inferiorly and then run back for a "
+        "Lembert layer. The closure integrity was confirmed by ensuring the tightness "
+        "of each bite. The repair was placed underwater and a leak test was performed "
+        "with no leak."
     ),
+
+    # ── OPTIONS ───────────────────────────────────────────────────────────
+    # {linx_sizer_mm}  : "11", "13", "14"
+    # {linx_device_mm} : "14", "16", "17"
 
     "LINX_IMPLANTATION": (
         "LINX IMPLANTATION:\n"
-        "The LINX Reflux Management System was positioned around the distal esophagus at the "
-        "gastroesophageal junction. The magnetic ring was closed posteriorly with correct alignment "
-        "confirmed and free mobility relative to surrounding structures verified."
+        "Using the sizer the distal esophagus at the level of the GEJ/LES just above "
+        "the GEJ fat pad. We sized the esophagus to be at {linx_sizer_mm}mm (this is "
+        "where the sizer \"popped off\") and did this run twice. Therefore a "
+        "{linx_device_mm}mm LINX device was opened and placed. Using the standard "
+        "technique the LINX was placed around the GEJ and within the posterior vagus "
+        "and clasped anteriorly. The LINX was freely (but not excessively) mobile."
     ),
 
     # ── OPTIONS ───────────────────────────────────────────────────────────
